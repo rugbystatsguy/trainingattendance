@@ -104,7 +104,7 @@
     }
 
     #emailBtn {
-      background-color: #007BFF; /* Blue background for the email button */
+      background-color: #007BFF;
     }
 
     .modal {
@@ -181,6 +181,15 @@
     <select id="popupDropdown">
       <option value="">Select Player</option>
     </select>
+    <select id="reasonDropdown" style="display: none;">
+      <option value="">Select Reason</option>
+      <option value="Sick">Sick</option>
+      <option value="Injured">Injured</option>
+      <option value="Detention">Detention</option>
+      <option value="Transport">Transport</option>
+      <option value="Hockey Match">Hockey Match</option>
+      <option value="Other">Other</option>
+    </select>
     <button id="popupConfirm" onclick="handleConfirm()">Confirm</button>
   </div>
 </div>
@@ -204,7 +213,6 @@
   Share via WhatsApp
 </button>
 
-<!-- Share via Email -->
 <button id="emailBtn" onclick="shareViaEmail()">
   Share via Email
 </button>
@@ -225,11 +233,14 @@
     attended: new Set(participants)
   };
 
+  const excuseReasons = {}; // { playerName: reason }
+
   let currentAction = "";
 
   function showModal(action) {
     currentAction = action;
     const dropdown = document.getElementById('popupDropdown');
+    const reasonDropdown = document.getElementById('reasonDropdown');
     dropdown.innerHTML = '<option value="">Select Player</option>';
     participants.forEach(name => {
       const option = document.createElement('option');
@@ -237,20 +248,27 @@
       option.text = name;
       dropdown.appendChild(option);
     });
+
+    reasonDropdown.style.display = (action === 'excused') ? 'block' : 'none';
     document.getElementById('popupModal').style.display = "block";
   }
 
   function handleConfirm() {
     const select = document.getElementById('popupDropdown');
+    const reasonSelect = document.getElementById('reasonDropdown');
     const name = select.value;
+    const reason = reasonSelect.value;
+
     if (!name) return;
 
     playerStatus.excused.delete(name);
     playerStatus.absent.delete(name);
     playerStatus.attended.delete(name);
+    delete excuseReasons[name];
 
     if (currentAction === 'excused') {
       playerStatus.excused.add(name);
+      if (reason) excuseReasons[name] = reason;
     } else if (currentAction === 'absent') {
       playerStatus.absent.add(name);
     } else if (currentAction === 'correction') {
@@ -259,6 +277,7 @@
 
     updateLists();
     select.selectedIndex = 0;
+    reasonSelect.selectedIndex = 0;
     document.getElementById('popupModal').style.display = "none";
   }
 
@@ -276,12 +295,14 @@
 
     participants.forEach(name => {
       const li = document.createElement('li');
-      li.textContent = name;
       if (playerStatus.excused.has(name)) {
+        li.textContent = `${name} (${excuseReasons[name] || 'No reason'})`;
         document.getElementById('excusedList').appendChild(li);
       } else if (playerStatus.absent.has(name)) {
+        li.textContent = name;
         document.getElementById('absentList').appendChild(li);
       } else if (playerStatus.attended.has(name)) {
+        li.textContent = name;
         document.getElementById('attendedList').appendChild(li);
       }
     });
@@ -300,8 +321,11 @@
     document.getElementById('summaryCoaches').textContent = coaches;
   }
 
-  function formatList(set) {
-    return Array.from(set).sort().join('\n') || 'None';
+  function formatList(set, includeReasons = false) {
+    return Array.from(set)
+      .sort()
+      .map(name => includeReasons ? `${name} (${excuseReasons[name] || 'No reason'})` : name)
+      .join('\n') || 'None';
   }
 
   function shareToWhatsApp() {
@@ -310,7 +334,7 @@
     const place = document.getElementById('summaryLocation').textContent;
     const coaches = document.getElementById('summaryCoaches').textContent;
 
-    const excused = formatList(playerStatus.excused);
+    const excused = formatList(playerStatus.excused, true);
     const absent = formatList(playerStatus.absent);
     const attended = formatList(playerStatus.attended);
 
@@ -327,7 +351,7 @@ ${absent}
 
 *Attended:*
 ${attended}
-  `;
+    `;
 
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
@@ -339,7 +363,7 @@ ${attended}
     const place = document.getElementById('summaryLocation').textContent;
     const coaches = document.getElementById('summaryCoaches').textContent;
 
-    const excused = formatList(playerStatus.excused);
+    const excused = formatList(playerStatus.excused, true);
     const absent = formatList(playerStatus.absent);
     const attended = formatList(playerStatus.attended);
 
@@ -359,7 +383,7 @@ ${attended}
     `;
 
     const subject = `Attendance at U14 FHHS Rugby Training - ${date}`;
-    const mailtoLink = `mailto:rugby@fishhoekhs.com,sports@fishhoekhs.com?cc=edwin@ipoint.co.za,zane.olckers@gmail.com&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(plainTextBody)}`;
+    const mailtoLink = `mailto:rugby@fishhoekhs.com;sports@fishhoekhs.com?cc=edwin@ipoint.co.za;zane.olckers@gmail.com&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(plainTextBody)}`;
 
     window.location.href = mailtoLink;
   }
