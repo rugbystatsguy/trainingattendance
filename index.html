@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Training Attendance Register</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      margin: auto;
+      max-width: 900px;
+    }
+
+    h1, h2 {
+      text-align: center;
+    }
+
+    .info-section, .summary-section {
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      padding: 15px;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+    }
+
+    .info-section label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    .info-section input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      box-sizing: border-box;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .button-container {
+      flex: 1 1 30%;
+      text-align: center;
+    }
+
+    button {
+      padding: 10px;
+      font-size: 16px;
+      width: 100%;
+      margin-top: 5px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .excused-button, #excusedConfirm {
+      background-color: #5bc0de;
+      color: white;
+    }
+
+    .absent-button, #absentConfirm {
+      background-color: #5bc0de;
+      color: white;
+    }
+
+    .correction-button, #correctionConfirm {
+      background-color: #d9534f;
+      color: white;
+    }
+
+    .summary-list {
+      padding-left: 20px;
+    }
+
+    .training-summary {
+      background-color: #eef;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+    }
+
+    #whatsappBtn, #emailBtn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 20px auto;
+      padding: 10px 20px;
+      background-color: #25D366;
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
+      width: 100%;
+      text-align: center;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    #emailBtn {
+      background-color: #007BFF; /* Blue background for the email button */
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 10;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.6);
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 400px;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .modal-content select {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+
+    .modal-content button {
+      font-size: 16px;
+      padding: 10px;
+    }
+
+    .whatsapp-icon {
+      width: 20px;
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Training Attendance Register U14 FFHS</h1>
+
+<div class="info-section">
+  <label for="trainingDate">Date:</label>
+  <input type="date" id="trainingDate" onchange="updateTrainingSummary()" />
+
+  <label for="location">Place:</label>
+  <input type="text" id="location" placeholder="FHHS" onchange="updateTrainingSummary()" />
+
+  <label for="coaches">Coaches:</label>
+  <input type="text" id="coaches" placeholder="Zane Olckers, Edwin Fellows" onchange="updateTrainingSummary()" />
+</div>
+
+<div class="button-row">
+  <div class="button-container">
+    <button class="excused-button" onclick="showModal('excused')">Excused</button>
+  </div>
+  <div class="button-container">
+    <button class="absent-button" onclick="showModal('absent')">Absent</button>
+  </div>
+  <div class="button-container">
+    <button class="correction-button" onclick="showModal('correction')">Correction</button>
+  </div>
+</div>
+
+<!-- Popup Modal -->
+<div id="popupModal" class="modal">
+  <div class="modal-content">
+    <select id="popupDropdown">
+      <option value="">Select Player</option>
+    </select>
+    <button id="popupConfirm" onclick="handleConfirm()">Confirm</button>
+  </div>
+</div>
+
+<div class="summary-section">
+  <h2>U14 Training Attendance Register</h2>
+  <div class="training-summary" id="trainingSummaryDisplay">
+    <p><strong>Date:</strong> <span id="summaryDate">-</span></p>
+    <p><strong>Place:</strong> <span id="summaryLocation">FHHS</span></p>
+    <p><strong>Coaches:</strong> <span id="summaryCoaches">Zane Olckers, Edwin Fellows</span></p>
+  </div>
+
+  <div class="category"><strong>Excused:</strong><ul id="excusedList" class="summary-list"></ul></div>
+  <div class="category"><strong>Absent:</strong><ul id="absentList" class="summary-list"></ul></div>
+  <div class="category"><strong>Attended:</strong><ul id="attendedList" class="summary-list"></ul></div>
+</div>
+
+<!-- Share Buttons -->
+<button id="whatsappBtn" onclick="shareToWhatsApp()">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp Icon" class="whatsapp-icon" />
+  Share via WhatsApp
+</button>
+
+<!-- Share via Email -->
+<button id="emailBtn" onclick="shareViaEmail()">
+  Share via Email
+</button>
+
+<script>
+  const participants = [
+    "Alex Cowan", "Bradley Zimbizi", "Caleb Gibson", "Daniel Wichall", "Ethan Wadsworth",
+    "Inako Ntsomi", "Jack Kershaw", "Josiah Nevins-Selvadurai", "Juan Damon",
+    "Jude Heeger", "Kai Gebhard", "Kgosta Leon Jack", "Leo Pera", "Logan Tomlison",
+    "Michael Theron", "Mohammad Hassen-Parker", "Neakail Wessels", "Noeh Oellerman", "Owen Widelski",
+    "Paballo Sehlako", "Quinn Doig", "Rushtun Dickson", "Ryan Anderson", "Sanchez Manjinga",
+    "Sihlangule Heshula", "Sim Stephenson", "Siphiwe Dlamini", "Tafara Madanire", "Zachary Warncke"
+  ];
+
+  const playerStatus = {
+    excused: new Set(),
+    absent: new Set(),
+    attended: new Set(participants)
+  };
+
+  let currentAction = "";
+
+  function showModal(action) {
+    currentAction = action;
+    const dropdown = document.getElementById('popupDropdown');
+    dropdown.innerHTML = '<option value="">Select Player</option>';
+    participants.forEach(name => {
+      const option = document.createElement('option');
+      option.value = name;
+      option.text = name;
+      dropdown.appendChild(option);
+    });
+    document.getElementById('popupModal').style.display = "block";
+  }
+
+  function handleConfirm() {
+    const select = document.getElementById('popupDropdown');
+    const name = select.value;
+    if (!name) return;
+
+    playerStatus.excused.delete(name);
+    playerStatus.absent.delete(name);
+    playerStatus.attended.delete(name);
+
+    if (currentAction === 'excused') {
+      playerStatus.excused.add(name);
+    } else if (currentAction === 'absent') {
+      playerStatus.absent.add(name);
+    } else if (currentAction === 'correction') {
+      playerStatus.attended.add(name);
+    }
+
+    updateLists();
+    select.selectedIndex = 0;
+    document.getElementById('popupModal').style.display = "none";
+  }
+
+  window.onclick = function(event) {
+    const modal = document.getElementById('popupModal');
+    if (event.target === modal) {
+      modal.style.display = "none";
+    }
+  }
+
+  function updateLists() {
+    ['excusedList', 'absentList', 'attendedList'].forEach(id => {
+      document.getElementById(id).innerHTML = '';
+    });
+
+    participants.forEach(name => {
+      const li = document.createElement('li');
+      li.textContent = name;
+      if (playerStatus.excused.has(name)) {
+        document.getElementById('excusedList').appendChild(li);
+      } else if (playerStatus.absent.has(name)) {
+        document.getElementById('absentList').appendChild(li);
+      } else if (playerStatus.attended.has(name)) {
+        document.getElementById('attendedList').appendChild(li);
+      }
+    });
+  }
+
+  function updateTrainingSummary() {
+    const dateInput = document.getElementById('trainingDate').value;
+    const location = document.getElementById('location').value || 'FHHS';
+    const coaches = document.getElementById('coaches').value || 'Zane Olckers, Edwin Fellows';
+
+    const date = new Date(dateInput);
+    const formattedDate = dateInput ? `${date.getDate()} ${date.toLocaleString('default', { month: 'long' })} ${date.getFullYear()}` : '-';
+
+    document.getElementById('summaryDate').textContent = formattedDate;
+    document.getElementById('summaryLocation').textContent = location;
+    document.getElementById('summaryCoaches').textContent = coaches;
+  }
+
+  function formatList(set) {
+    return Array.from(set).sort().join('\n') || 'None';
+  }
+
+  function shareToWhatsApp() {
+    updateTrainingSummary();
+    const date = document.getElementById('summaryDate').textContent;
+    const place = document.getElementById('summaryLocation').textContent;
+    const coaches = document.getElementById('summaryCoaches').textContent;
+
+    const excused = formatList(playerStatus.excused);
+    const absent = formatList(playerStatus.absent);
+    const attended = formatList(playerStatus.attended);
+
+    const message = `
+*Date:* ${date}
+*Place:* ${place}
+*Coaches:* ${coaches}
+
+*Excused:*
+${excused}
+
+*Absent:*
+${absent}
+
+*Attended:*
+${attended}
+  `;
+
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+  }
+
+  function shareViaEmail() {
+    updateTrainingSummary();
+    const date = document.getElementById('summaryDate').textContent;
+    const place = document.getElementById('summaryLocation').textContent;
+    const coaches = document.getElementById('summaryCoaches').textContent;
+
+    const excused = formatList(playerStatus.excused);
+    const absent = formatList(playerStatus.absent);
+    const attended = formatList(playerStatus.attended);
+
+    const plainTextBody = `
+Date: ${date}
+Place: ${place}
+Coaches: ${coaches}
+
+Excused:
+${excused}
+
+Absent:
+${absent}
+
+Attended:
+${attended}
+    `;
+
+    const subject = `Attendance at U14 FHHS Rugby Training - ${date}`;
+    const mailtoLink = `mailto:rugby@fishhoekhs.com,sports@fishhoekhs.com?cc=edwin@ipoint.co.za&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(plainTextBody)}`;
+
+    window.location.href = mailtoLink;
+  }
+
+  updateTrainingSummary();
+</script>
+
+</body>
+</html>
