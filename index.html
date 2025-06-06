@@ -187,8 +187,9 @@
       <option value="Injured">Injured</option>
       <option value="Detention">Detention</option>
       <option value="Transport">Transport</option>
-      <option value="Hockey Match">Hockey Match</option>
+      <option value="Hockey">Hockey</option>
       <option value="Soccer">Soccer</option>
+      <option value="Study">Study</option>
       <option value="Other">Other</option>
     </select>
     <button id="popupConfirm" onclick="handleConfirm()">Confirm</button>
@@ -222,7 +223,7 @@
   const participants = [
     "Alex Cowan", "Bradley Zimbizi", "Caleb Gibson", "Daniel Wichall", "Ethan Wadsworth",
     "Inako Ntsomi", "Jack Kershaw", "Josiah Nevins-Selvadurai", "Juan Damon",
-    "Jude Heeger", "Kai Gebhard", "Kgosta Leon Jack", "Leo Pera", "Logan Tomlison",
+    "Jude Heeger", "Kai Gebhard", "Kgosta Leon Jack", "Leo Pera", "Logan Tomlinson",
     "Michael Theron", "Mohammad Hassen-Parker", "Neakail Wessels", "Noeh Oellerman", "Owen Widelski",
     "Paballo Sehlako", "Rushtun Dickson", "Ryan Anderson", "Sanchez Manjinga",
     "Sihlangule Heshula", "Sim Stephenson", "Siphiwe Dlamini", "Tafara Madanire", "Zachary Warncke"
@@ -384,7 +385,7 @@ ${attended}
     `;
 
     const subject = `Attendance at U14 FHHS Rugby Training - ${date}`;
-    const mailtoLink = `mailto:rugby@fishhoekhs.com,sports@fishhoekhs.com?cc=edwin@ipoint.co.za,zane.olckers@gmail.com&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(plainTextBody)}`;
+    const mailtoLink = `mailto:rugby@fishhoekhs.com,sport@fishhoekhs.com?cc=edwin@ipoint.co.za,zane.olckers@gmail.com&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(plainTextBody)}`;
 
     window.location.href = mailtoLink;
   }
