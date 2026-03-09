@@ -343,7 +343,6 @@
     const message = `
 *Date:* ${date}
 *Place:* ${place}
-*Coaches:* ${coaches}
 
 *Excused:*
 ${excused}
@@ -372,7 +371,6 @@ ${attended}
     const plainTextBody = `
 Date: ${date}
 Place: ${place}
-Coaches: ${coaches}
 
 Excused:
 ${excused}
@@ -384,7 +382,7 @@ Attended:
 ${attended}
     `;
 
-    const subject = `Attendance at U14 FHHS Rugby Training - ${date}`;
+    const subject = `Attendance at U15 FHHS Rugby Training - ${date}`;
     const mailtoLink = `mailto:sindia@fishhoekhs.com?cc=edwin@ipoint.co.za,zane.olckers@gmail.com&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(plainTextBody)}`;
 
     window.location.href = mailtoLink;
@@ -395,6 +393,7 @@ ${attended}
 
 </body>
 </html>
+
 
 
 
