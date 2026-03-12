@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -158,9 +159,6 @@
 
   <label for="location">Place:</label>
   <input type="text" id="location" placeholder="FHHS" onchange="updateTrainingSummary()" />
-
-  <label for="coaches">Coaches:</label>
-  <input type="text" id="coaches" placeholder="Zane Olckers, Edwin Fellows" onchange="updateTrainingSummary()" />
 </div>
 
 <div class="button-row">
@@ -201,7 +199,6 @@
   <div class="training-summary" id="trainingSummaryDisplay">
     <p><strong>Date:</strong> <span id="summaryDate">-</span></p>
     <p><strong>Place:</strong> <span id="summaryLocation">FHHS</span></p>
-    <p><strong>Coaches:</strong> <span id="summaryCoaches">Zane Olckers, Edwin Fellows</span></p>
   </div>
 
   <div class="category"><strong>Excused:</strong><ul id="excusedList" class="summary-list"></ul></div>
@@ -313,14 +310,13 @@
   function updateTrainingSummary() {
     const dateInput = document.getElementById('trainingDate').value;
     const location = document.getElementById('location').value || 'FHHS';
-    const coaches = document.getElementById('coaches').value || 'Zane Olckers, Edwin Fellows';
 
     const date = new Date(dateInput);
     const formattedDate = dateInput ? `${date.getDate()} ${date.toLocaleString('default', { month: 'long' })} ${date.getFullYear()}` : '-';
 
     document.getElementById('summaryDate').textContent = formattedDate;
     document.getElementById('summaryLocation').textContent = location;
-    document.getElementById('summaryCoaches').textContent = coaches;
+
   }
 
   function formatList(set, includeReasons = false) {
@@ -393,6 +389,7 @@ ${attended}
 
 </body>
 </html>
+
 
 
 
