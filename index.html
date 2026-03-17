@@ -1,401 +1,264 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Training Attendance Register</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      margin: auto;
-      max-width: 900px;
-    }
-
-    h1, h2 {
-      text-align: center;
-    }
-
-    .info-section, .summary-section {
-      margin-bottom: 20px;
-      border: 1px solid #ccc;
-      padding: 15px;
-      border-radius: 8px;
-      background-color: #f9f9f9;
-    }
-
-    .info-section label {
-      display: block;
-      margin-top: 10px;
-      font-weight: bold;
-    }
-
-    .info-section input {
-      width: 100%;
-      padding: 8px;
-      margin-top: 4px;
-      box-sizing: border-box;
-    }
-
-    .button-row {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-around;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-
-    .button-container {
-      flex: 1 1 30%;
-      text-align: center;
-    }
-
-    button {
-      padding: 10px;
-      font-size: 16px;
-      width: 100%;
-      margin-top: 5px;
-      border-radius: 6px;
-      border: none;
-      cursor: pointer;
-    }
-
-    .excused-button, #excusedConfirm {
-      background-color: #5bc0de;
-      color: white;
-    }
-
-    .absent-button, #absentConfirm {
-      background-color: #5bc0de;
-      color: white;
-    }
-
-    .correction-button, #correctionConfirm {
-      background-color: #d9534f;
-      color: white;
-    }
-
-    .summary-list {
-      padding-left: 20px;
-    }
-
-    .training-summary {
-      background-color: #eef;
-      padding: 10px;
-      border-radius: 6px;
-      margin-bottom: 20px;
-    }
-
-    #whatsappBtn, #emailBtn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 20px auto;
-      padding: 10px 20px;
-      background-color: #25D366;
-      color: white;
-      font-weight: bold;
-      font-size: 16px;
-      width: 100%;
-      text-align: center;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    #emailBtn {
-      background-color: #007BFF;
-    }
-
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 10;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgba(0,0,0,0.6);
-    }
-
-    .modal-content {
-      background-color: #fefefe;
-      margin: 15% auto;
-      padding: 20px;
-      border: 1px solid #888;
-      width: 80%;
-      max-width: 400px;
-      border-radius: 10px;
-      text-align: center;
-    }
-
-    .modal-content select {
-      width: 100%;
-      padding: 10px;
-      font-size: 16px;
-      margin-bottom: 15px;
-    }
-
-    .modal-content button {
-      font-size: 16px;
-      padding: 10px;
-    }
-
-    .whatsapp-icon {
-      width: 20px;
-      margin-right: 10px;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Training Attendance Register</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<style>
+body{font-family:Arial,sans-serif;padding:20px;margin:auto;max-width:900px;}
+h1,h2{text-align:center;}
+.info-section,.summary-section{margin-bottom:20px;border:1px solid #ccc;padding:15px;border-radius:8px;background:#f9f9f9;}
+label{display:block;margin-top:10px;font-weight:bold;}
+input{width:100%;padding:8px;margin-top:4px;box-sizing:border-box;}
+.button-row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px;}
+.button-container{flex:1;}
+button{padding:10px;font-size:16px;width:100%;border-radius:6px;border:none;cursor:pointer;}
+.excused-button{background:#5bc0de;color:white;}
+.absent-button{background:#5bc0de;color:white;}
+.correction-button{background:#d9534f;color:white;}
+.summary-list{padding-left:20px;}
+.training-summary{background:#eef;padding:10px;border-radius:6px;margin-bottom:20px;}
+#whatsappBtn{background:#25D366;color:white;font-weight:bold;margin-top:10px;}
+#emailBtn{background:#007BFF;color:white;font-weight:bold;margin-top:10px;}
+#resetBtn{background:#444;color:white;font-weight:bold;margin-top:10px;}
+.modal{display:none;position:fixed;z-index:10;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.6);}
+.modal-content{background:#fff;margin:15% auto;padding:20px;width:80%;max-width:400px;border-radius:10px;text-align:center;}
+select{width:100%;padding:10px;font-size:16px;margin-bottom:15px;}
+</style>
 </head>
 <body>
 
 <h1>Training Attendance Register U15 FFHS</h1>
 
 <div class="info-section">
-  <label for="trainingDate">Date:</label>
-  <input type="date" id="trainingDate" onchange="updateTrainingSummary()" />
-
-  <label for="location">Place:</label>
-  <input type="text" id="location" placeholder="FHHS" onchange="updateTrainingSummary()" />
+<label>Date</label>
+<input type="date" id="trainingDate">
+<label>Place</label>
+<input type="text" id="location" value="FHHS">
 </div>
 
 <div class="button-row">
-  <div class="button-container">
-    <button class="excused-button" onclick="showModal('excused')">Excused</button>
-  </div>
-  <div class="button-container">
-    <button class="absent-button" onclick="showModal('absent')">Absent</button>
-  </div>
-  <div class="button-container">
-    <button class="correction-button" onclick="showModal('correction')">Correction</button>
-  </div>
+<div class="button-container"><button class="excused-button" onclick="showModal('excused')">Excused</button></div>
+<div class="button-container"><button class="absent-button" onclick="showModal('absent')">Absent</button></div>
+<div class="button-container"><button class="correction-button" onclick="showModal('correction')">Correction</button></div>
 </div>
 
-<!-- Popup Modal -->
 <div id="popupModal" class="modal">
-  <div class="modal-content">
-    <select id="popupDropdown">
-      <option value="">Select Player</option>
-    </select>
-    <select id="reasonDropdown" style="display: none;">
-      <option value="">Select Reason</option>
-      <option value="Sick">Sick</option>
-      <option value="Injured">Injured</option>
-      <option value="Detention">Detention</option>
-      <option value="Transport">Transport</option>
-      <option value="Hockey">Hockey</option>
-      <option value="Soccer">Soccer</option>
-      <option value="Study">Study</option>
-      <option value="Other">Other</option>
-    </select>
-    <button id="popupConfirm" onclick="handleConfirm()">Confirm</button>
-  </div>
+<div class="modal-content">
+<select id="popupDropdown"></select>
+<select id="reasonDropdown" style="display:none;">
+<option value="">Reason</option>
+<option>Sick</option>
+<option>Injured</option>
+<option>Detention</option>
+<option>Transport</option>
+<option>Hockey</option>
+<option>Soccer</option>
+<option>Study</option>
+<option>Other</option>
+</select>
+<button onclick="handleConfirm()">Confirm</button>
+</div>
 </div>
 
 <div class="summary-section">
-  <h2>U15 Training Attendance Register</h2>
-  <div class="training-summary" id="trainingSummaryDisplay">
-    <p><strong>Date:</strong> <span id="summaryDate">-</span></p>
-    <p><strong>Place:</strong> <span id="summaryLocation">FHHS</span></p>
-  </div>
-
-  <div class="category"><strong>Excused:</strong><ul id="excusedList" class="summary-list"></ul></div>
-  <div class="category"><strong>Absent:</strong><ul id="absentList" class="summary-list"></ul></div>
-  <div class="category"><strong>Attended:</strong><ul id="attendedList" class="summary-list"></ul></div>
+<h2>U15 Training Attendance Register</h2>
+<div class="training-summary">
+<p><strong>Date:</strong> <span id="summaryDate">-</span></p>
+<p><strong>Place:</strong> <span id="summaryLocation">FHHS</span></p>
+</div>
+<div><strong>Excused:</strong><ul id="excusedList" class="summary-list"></ul></div>
+<div><strong>Absent:</strong><ul id="absentList" class="summary-list"></ul></div>
+<div><strong>Attended:</strong><ul id="attendedList" class="summary-list"></ul></div>
 </div>
 
-<!-- Share Buttons -->
-<button id="whatsappBtn" onclick="shareToWhatsApp()">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp Icon" class="whatsapp-icon" />
-  Share via WhatsApp
-</button>
-
-<button id="emailBtn" onclick="shareViaEmail()">
-  Share via Email
-</button>
+<button id="whatsappBtn" onclick="shareToWhatsApp()">Share via WhatsApp</button>
+<button id="emailBtn" onclick="shareViaEmail()">Share via Email</button>
+<button id="resetBtn" onclick="resetAll()">Reset All</button>
 
 <script>
-  const participants = [
-    "Blake Willis","Bradley Zimbizi", "Caleb Gibson", "Daniel Wichall", "Ethan Wadsworth", "Emmanuel Simbo", 
-    "Gabriel Mitchell", "Greg Psvura", "Indiphile Soga", "Jack Kershaw", "Juan Damon", 
-    "Jude Heeger", "Kai Gebhard", "Kgosta Leon Jack", "Leo Pera", "Logan Tomlinson", "Lwandle Sopela", "Michael Page",
-    "Michael Theron", "Mohammad Hassen-Parker", "Neakail Wessels", "Noeh Oellerman", "Owen Widelski",
-    "Paballo Sehlako", "Rushtun Dickson", "Ryan Anderson", "Sanchez Manjinga",
-    "Sim Stephenson", "Tafara Madanire", "Zachary Warncke"
-  ];
+const participants=[
+"Blake Willis","Bradley Zimbizi","Caleb Gibson","Daniel Wichall","Ethan Wadsworth","Emmanuel Simbo",
+"Gabriel Mitchell","Greg Psvura","Indiphile Soga","Jack Kershaw","Juan Damon","Jude Heeger",
+"Kai Gebhard","Kgosta Leon Jack","Leo Pera","Logan Tomlinson","Lwandle Sopela","Michael Page",
+"Michael Theron","Mohammad Hassen-Parker","Neakail Wessels","Noeh Oellerman","Owen Widelski",
+"Paballo Sehlako","Rushtun Dickson","Ryan Anderson","Sanchez Manjinga",
+"Sim Stephenson","Tafara Madanire","Thomas Le Grange","Zachary Warncke"
+];
 
-  const playerStatus = {
-    excused: new Set(),
-    absent: new Set(),
-    attended: new Set(participants)
-  };
+let playerStatus={
+excused:new Set(),
+absent:new Set(),
+attended:new Set(participants)
+};
+let excuseReasons={};
+let currentAction="";
 
-  const excuseReasons = {}; // { playerName: reason }
+function saveData(){
+const filterSet=(set)=>[...set].filter(name=>name && name.trim()!=="" && name!=="Select Player");
+const data={
+excused:filterSet(playerStatus.excused),
+absent:filterSet(playerStatus.absent),
+attended:filterSet(playerStatus.attended),
+reasons:excuseReasons,
+date:document.getElementById("trainingDate").value,
+location:document.getElementById("location").value
+};
+localStorage.setItem("trainingAttendance",JSON.stringify(data));
+}
 
-  let currentAction = "";
+function loadData(){
+const saved=localStorage.getItem("trainingAttendance");
+if(!saved) return;
+const data=JSON.parse(saved);
+playerStatus.excused=new Set(data.excused);
+playerStatus.absent=new Set(data.absent);
+playerStatus.attended=new Set(data.attended);
+excuseReasons=data.reasons||{};
+document.getElementById("trainingDate").value=data.date||"";
+document.getElementById("location").value=data.location||"FHHS";
+updateLists();
+updateTrainingSummary();
+}
 
-  function showModal(action) {
-    currentAction = action;
-    const dropdown = document.getElementById('popupDropdown');
-    const reasonDropdown = document.getElementById('reasonDropdown');
-    dropdown.innerHTML = '<option value="">Select Player</option>';
-    participants.forEach(name => {
-      const option = document.createElement('option');
-      option.value = name;
-      option.text = name;
-      dropdown.appendChild(option);
-    });
+function showModal(action){
+currentAction=action;
+const dropdown=document.getElementById("popupDropdown");
+const reason=document.getElementById("reasonDropdown");
+dropdown.innerHTML="<option>Select Player</option>";
+participants.forEach(name=>{
+let opt=document.createElement("option");
+opt.value=name;
+opt.textContent=name;
+dropdown.appendChild(opt);
+});
+reason.style.display=(action==="excused")?"block":"none";
+document.getElementById("popupModal").style.display="block";
+}
 
-    reasonDropdown.style.display = (action === 'excused') ? 'block' : 'none';
-    document.getElementById('popupModal').style.display = "block";
-  }
+function handleConfirm(){
+const select=document.getElementById("popupDropdown");
+const reasonSelect=document.getElementById("reasonDropdown");
+const name=select.value;
+const reason=reasonSelect.value;
 
-  function handleConfirm() {
-    const select = document.getElementById('popupDropdown');
-    const reasonSelect = document.getElementById('reasonDropdown');
-    const name = select.value;
-    const reason = reasonSelect.value;
+// Ignore placeholder or empty names
+if(!name || name.trim()==="" || name==="Select Player") return;
 
-    if (!name) return;
+// Remove from all sets
+playerStatus.excused.delete(name);
+playerStatus.absent.delete(name);
+playerStatus.attended.delete(name);
+delete excuseReasons[name];
 
-    playerStatus.excused.delete(name);
-    playerStatus.absent.delete(name);
-    playerStatus.attended.delete(name);
-    delete excuseReasons[name];
+// Add to correct set
+if(currentAction==="excused"){
+playerStatus.excused.add(name);
+if(reason && reason.trim()!=="") excuseReasons[name]=reason;
+} else if(currentAction==="absent"){
+playerStatus.absent.add(name);
+} else if(currentAction==="correction"){
+playerStatus.attended.add(name);
+}
 
-    if (currentAction === 'excused') {
-      playerStatus.excused.add(name);
-      if (reason) excuseReasons[name] = reason;
-    } else if (currentAction === 'absent') {
-      playerStatus.absent.add(name);
-    } else if (currentAction === 'correction') {
-      playerStatus.attended.add(name);
-    }
+// Close modal and update
+select.selectedIndex=0;
+reasonSelect.selectedIndex=0;
+document.getElementById("popupModal").style.display="none";
+updateLists();
+saveData();
+}
 
-    updateLists();
-    select.selectedIndex = 0;
-    reasonSelect.selectedIndex = 0;
-    document.getElementById('popupModal').style.display = "none";
-  }
+function updateLists(){
+["excusedList","absentList","attendedList"].forEach(id=>{
+document.getElementById(id).innerHTML="";
+});
+participants.forEach(name=>{
+let li=document.createElement("li");
+if(playerStatus.excused.has(name)){
+li.textContent=name+" ("+(excuseReasons[name]||"No reason")+")";
+document.getElementById("excusedList").appendChild(li);
+} else if(playerStatus.absent.has(name)){
+li.textContent=name;
+document.getElementById("absentList").appendChild(li);
+} else {
+li.textContent=name;
+document.getElementById("attendedList").appendChild(li);
+}
+});
+}
 
-  window.onclick = function(event) {
-    const modal = document.getElementById('popupModal');
-    if (event.target === modal) {
-      modal.style.display = "none";
-    }
-  }
+function updateTrainingSummary(){
+const dateInput=document.getElementById("trainingDate").value;
+const location=document.getElementById("location").value||"FHHS";
+let formatted="-";
+if(dateInput){
+const d=new Date(dateInput);
+formatted=d.getDate()+" "+d.toLocaleString('default',{month:'long'})+" "+d.getFullYear();
+}
+document.getElementById("summaryDate").textContent=formatted;
+document.getElementById("summaryLocation").textContent=location;
+saveData();
+}
 
-  function updateLists() {
-    ['excusedList', 'absentList', 'attendedList'].forEach(id => {
-      document.getElementById(id).innerHTML = '';
-    });
+// Ensure only real participant names are exported
+function formatList(set, reason=false){
+return [...set]
+.filter(name=>name && name.trim()!=="" && name!=="Select Player")
+.sort()
+.map(name=>reason ? `${name} (${excuseReasons[name]||"No reason"})` : name)
+.join("\n")||"None";
+}
 
-    participants.forEach(name => {
-      const li = document.createElement('li');
-      if (playerStatus.excused.has(name)) {
-        li.textContent = `${name} (${excuseReasons[name] || 'No reason'})`;
-        document.getElementById('excusedList').appendChild(li);
-      } else if (playerStatus.absent.has(name)) {
-        li.textContent = name;
-        document.getElementById('absentList').appendChild(li);
-      } else if (playerStatus.attended.has(name)) {
-        li.textContent = name;
-        document.getElementById('attendedList').appendChild(li);
-      }
-    });
-  }
+function shareToWhatsApp(){
+updateTrainingSummary();
+const date=document.getElementById("summaryDate").textContent;
+const place=document.getElementById("summaryLocation").textContent;
+const message=`*Training Attendance Register*
 
-  function updateTrainingSummary() {
-    const dateInput = document.getElementById('trainingDate').value;
-    const location = document.getElementById('location').value || 'FHHS';
+*Date*: ${date}
+*Place*: ${place}
 
-    const date = new Date(dateInput);
-    const formattedDate = dateInput ? `${date.getDate()} ${date.toLocaleString('default', { month: 'long' })} ${date.getFullYear()}` : '-';
+*Excused*
+${formatList(playerStatus.excused,true)}
 
-    document.getElementById('summaryDate').textContent = formattedDate;
-    document.getElementById('summaryLocation').textContent = location;
+*Absent - Not Excused*
+${formatList(playerStatus.absent)}
 
-  }
+*Attended*
+${formatList(playerStatus.attended)}`;
+window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`,"_blank");
+}
 
-  function formatList(set, includeReasons = false) {
-    return Array.from(set)
-      .sort()
-      .map(name => includeReasons ? `${name} (${excuseReasons[name] || 'No reason'})` : name)
-      .join('\n') || 'None';
-  }
-
-  function shareToWhatsApp() {
-    updateTrainingSummary();
-    const date = document.getElementById('summaryDate').textContent;
-    const place = document.getElementById('summaryLocation').textContent;
-    const coaches = document.getElementById('summaryCoaches').textContent;
-
-    const excused = formatList(playerStatus.excused, true);
-    const absent = formatList(playerStatus.absent);
-    const attended = formatList(playerStatus.attended);
-
-    const message = `
-*Date:* ${date}
-*Place:* ${place}
-
-*Excused:*
-${excused}
-
-*Absent:*
-${absent}
-
-*Attended:*
-${attended}
-    `;
-
-    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
-  }
-
-  function shareViaEmail() {
-    updateTrainingSummary();
-    const date = document.getElementById('summaryDate').textContent;
-    const place = document.getElementById('summaryLocation').textContent;
-    const coaches = document.getElementById('summaryCoaches').textContent;
-
-    const excused = formatList(playerStatus.excused, true);
-    const absent = formatList(playerStatus.absent);
-    const attended = formatList(playerStatus.attended);
-
-    const plainTextBody = `
-Date: ${date}
+function shareViaEmail(){
+updateTrainingSummary();
+const date=document.getElementById("summaryDate").textContent;
+const place=document.getElementById("summaryLocation").textContent;
+const body=`Date: ${date}
 Place: ${place}
 
 Excused:
-${excused}
+${formatList(playerStatus.excused,true)}
 
 Absent:
-${absent}
+${formatList(playerStatus.absent)}
 
 Attended:
-${attended}
-    `;
+${formatList(playerStatus.attended)}`;
+const subject=`Attendance at U15 FHHS Rugby Training - ${date}`;
+window.location.href=`mailto:sindia@fishhoekhs.com?cc=edwin@ipoint.co.za,zane.olckers@gmail.com&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
 
-    const subject = `Attendance at U15 FHHS Rugby Training - ${date}`;
-    const mailtoLink = `mailto:sindia@fishhoekhs.com?cc=edwin@ipoint.co.za,zane.olckers@gmail.com&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(plainTextBody)}`;
+function resetAll(){
+if(!confirm("Reset all attendance data?")) return;
+localStorage.removeItem("trainingAttendance");
+location.reload();
+}
 
-    window.location.href = mailtoLink;
-  }
-
-  updateTrainingSummary();
+document.getElementById("trainingDate").addEventListener("change",updateTrainingSummary);
+document.getElementById("location").addEventListener("input",updateTrainingSummary);
+window.onload=loadData;
 </script>
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
